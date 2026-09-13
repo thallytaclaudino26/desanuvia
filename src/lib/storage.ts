@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/client";
+
 export interface MoodEntry {
   id: string;
   emoji: string;
@@ -13,66 +15,148 @@ export interface ProgressEntry {
   createdAt: string;
 }
 
-const MOOD_KEY = "desanuvia:mood-entries";
-const PROGRESS_KEY = "desanuvia:progress";
 const ONBOARDING_KEY = "desanuvia:onboarding-done";
+const PENDING_MOOD_KEY = "desanuvia:pending-mood";
 
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function write<T>(key: string, value: T) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(key, JSON.stringify(value));
-}
-
-export function getMoodEntries(): MoodEntry[] {
-  return read<MoodEntry[]>(MOOD_KEY, []);
-}
-
-export function addMoodEntry(entry: {
+interface PendingMood {
   emoji: string;
   score: number;
   note?: string;
-}): MoodEntry {
-  const entries = getMoodEntries();
+}
+
+function timeOfDayNow(): MoodEntry["timeOfDay"] {
   const hour = new Date().getHours();
-  const timeOfDay: MoodEntry["timeOfDay"] =
-    hour < 6 ? "madrugada" : hour < 12 ? "manha" : hour < 18 ? "tarde" : "noite";
-  const newEntry: MoodEntry = {
-    ...entry,
-    id: crypto.randomUUID(),
-    timeOfDay,
-    createdAt: new Date().toISOString(),
+  return hour < 6 ? "madrugada" : hour < 12 ? "manha" : hour < 18 ? "tarde" : "noite";
+}
+
+export async function getMoodEntries(): Promise<MoodEntry[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("mood_entries")
+    .select("id, emoji, score, note, time_of_day, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map((row) => ({
+    id: row.id,
+    emoji: row.emoji,
+    score: row.score,
+    note: row.note ?? undefined,
+    timeOfDay: row.time_of_day,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function addMoodEntry(entry: {
+  emoji: string;
+  score: number;
+  note?: string;
+}): Promise<MoodEntry | null> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("mood_entries")
+    .insert({
+      user_id: user.id,
+      emoji: entry.emoji,
+      score: entry.score,
+      note: entry.note ?? null,
+      time_of_day: timeOfDayNow(),
+    })
+    .select("id, emoji, score, note, time_of_day, created_at")
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    emoji: data.emoji,
+    score: data.score,
+    note: data.note ?? undefined,
+    timeOfDay: data.time_of_day,
+    createdAt: data.created_at,
   };
-  write(MOOD_KEY, [newEntry, ...entries]);
-  return newEntry;
 }
 
-export function getProgress(): ProgressEntry[] {
-  return read<ProgressEntry[]>(PROGRESS_KEY, []);
+export async function getProgress(): Promise<ProgressEntry[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("progress")
+    .select("content_id, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map((row) => ({
+    contentId: row.content_id,
+    status: row.status,
+    createdAt: row.created_at,
+  }));
 }
 
-export function markContentCompleted(contentId: string) {
-  const progress = getProgress();
-  write(PROGRESS_KEY, [
-    { contentId, status: "completed", createdAt: new Date().toISOString() },
-    ...progress,
-  ]);
+export async function markContentCompleted(contentId: string) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("progress").insert({
+    user_id: user.id,
+    content_id: contentId,
+    status: "completed",
+  });
 }
 
 export function isOnboardingDone(): boolean {
-  return read<boolean>(ONBOARDING_KEY, false);
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(ONBOARDING_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function setOnboardingDone(value: boolean) {
-  write(ONBOARDING_KEY, value);
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ONBOARDING_KEY, String(value));
+  } catch {
+    // localStorage indisponível (modo privado, por exemplo) — segue sem persistir.
+  }
+}
+
+export function setPendingMoodEntry(entry: PendingMood) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PENDING_MOOD_KEY, JSON.stringify(entry));
+  } catch {
+    // Sem localStorage disponível — o check-in inicial simplesmente não é
+    // pré-preenchido depois do login, sem impacto no restante do fluxo.
+  }
+}
+
+// O check-in de humor do onboarding acontece antes de existir conta (a pessoa
+// ainda não fez login/cadastro). Guardamos esse humor localmente e só o
+// enviamos ao Supabase depois que o login é concluído, quando já existe um
+// user_id válido para satisfazer a política de RLS da tabela mood_entries.
+export async function flushPendingMoodEntry() {
+  if (typeof window === "undefined") return;
+  const raw = window.localStorage.getItem(PENDING_MOOD_KEY);
+  if (!raw) return;
+
+  window.localStorage.removeItem(PENDING_MOOD_KEY);
+  try {
+    const entry = JSON.parse(raw) as PendingMood;
+    await addMoodEntry(entry);
+  } catch {
+    // Entrada corrompida — descartamos em vez de travar o login.
+  }
 }
 
 export function calculateStreak(progress: ProgressEntry[]) {

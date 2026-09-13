@@ -9,10 +9,7 @@ export default function HomePage() {
   const [recommendation, setRecommendation] = useState<ContentItem | null>(null);
 
   useEffect(() => {
-    // Recomendação depende de localStorage (só existe no navegador). Calculamos
-    // depois da montagem para o primeiro render bater com o HTML gerado no servidor.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRecommendation(getDailyRecommendation());
+    getDailyRecommendation().then(setRecommendation);
   }, []);
 
   return (

@@ -1,9 +1,9 @@
 import { contentItems, getContentById, type ContentItem } from "./content";
 import { getMoodEntries, getProgress } from "./storage";
 
-export function getDailyRecommendation(): ContentItem {
-  const moods = getMoodEntries();
-  const progress = getProgress();
+export async function getDailyRecommendation(): Promise<ContentItem> {
+  const moods = await getMoodEntries();
+  const progress = await getProgress();
   const completedIds = new Set(progress.map((p) => p.contentId));
   const lastMood = moods[0];
 

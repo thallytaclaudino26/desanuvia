@@ -22,21 +22,24 @@ export default function DiaryPage() {
   const [stats, setStats] = useState({ current: 0, longest: 0, totalSessions: 0 });
   const [note, setNote] = useState("");
 
-  function refresh() {
-    setEntries(getMoodEntries());
-    setStats(calculateStreak(getProgress()));
+  async function refresh() {
+    const [moodEntries, progress] = await Promise.all([
+      getMoodEntries(),
+      getProgress(),
+    ]);
+    setEntries(moodEntries);
+    setStats(calculateStreak(progress));
   }
 
   useEffect(() => {
-    // Mesmo motivo do /home: dados vêm de localStorage, só existem no navegador.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, []);
 
-  function handleAdd(m: (typeof moods)[number]) {
-    addMoodEntry({ emoji: m.emoji, score: m.score, note: note || undefined });
+  async function handleAdd(m: (typeof moods)[number]) {
+    await addMoodEntry({ emoji: m.emoji, score: m.score, note: note || undefined });
     setNote("");
-    refresh();
+    await refresh();
   }
 
   return (

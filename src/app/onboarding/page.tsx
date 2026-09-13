@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { addMoodEntry, setOnboardingDone } from "@/lib/storage";
+import { setOnboardingDone, setPendingMoodEntry } from "@/lib/storage";
 
 const moods = [
   { emoji: "😌", label: "Tranquilo(a)", score: 5 },
@@ -29,7 +29,7 @@ export default function OnboardingPage() {
 
   function finish() {
     if (mood) {
-      addMoodEntry({ emoji: mood.emoji, score: mood.score, note: reason ?? undefined });
+      setPendingMoodEntry({ emoji: mood.emoji, score: mood.score, note: reason ?? undefined });
     }
     setOnboardingDone(true);
     router.replace("/home");
