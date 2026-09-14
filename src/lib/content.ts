@@ -60,6 +60,24 @@ export const breathingTracks: BreathingTrack[] = [
     description:
       "Respiração lenta e ritmada a partir do peito, para cultivar uma emoção elevada de forma sustentada.",
   },
+  {
+    slug: "nadi-shodhana",
+    title: "Respiração Alternada (Nadi Shodhana)",
+    description:
+      "Alterna a respiração entre as narinas para equilibrar o sistema nervoso e acalmar a mente.",
+  },
+  {
+    slug: "ujjayi",
+    title: "Respiração Oceânica (Ujjayi)",
+    description:
+      "Respiração lenta e audível, com uma leve contração na garganta, usada para acalmar e ajudar a dormir.",
+  },
+  {
+    slug: "bhramari",
+    title: "Respiração da Abelha (Bhramari)",
+    description:
+      "Expiração prolongada em um zumbido suave — uma das formas mais rápidas de acalmar o sistema nervoso.",
+  },
 ];
 
 export const contentItems: ContentItem[] = [
@@ -198,6 +216,82 @@ export const contentItems: ContentItem[] = [
     trackSlug: "coerencia-cardiaca",
     levelIndex: 2,
     pattern: { inhale: 5, exhale: 5 },
+  },
+  {
+    id: "breath-nadi-1",
+    type: "breathing",
+    slug: "nadi-shodhana-nivel-1",
+    title: "Nadi Shodhana · Nível 1",
+    description:
+      "Tampe delicadamente uma narina de cada vez, alternando a respiração em um ritmo calmo.",
+    durationSeconds: 180,
+    isFree: true,
+    trackSlug: "nadi-shodhana",
+    levelIndex: 1,
+    pattern: { inhale: 4, exhale: 6 },
+  },
+  {
+    id: "breath-nadi-2",
+    type: "breathing",
+    slug: "nadi-shodhana-nivel-2",
+    title: "Nadi Shodhana · Nível 2",
+    description: "Ciclos mais longos de respiração alternada, sustentando a atenção no ritmo.",
+    durationSeconds: 300,
+    isFree: false,
+    trackSlug: "nadi-shodhana",
+    levelIndex: 2,
+    pattern: { inhale: 5, exhale: 7 },
+  },
+  {
+    id: "breath-ujjayi-1",
+    type: "breathing",
+    slug: "ujjayi-nivel-1",
+    title: "Ujjayi · Nível 1",
+    description:
+      "Inspire e expire pelo nariz com uma leve contração na garganta, criando um som suave como o do mar.",
+    durationSeconds: 180,
+    isFree: true,
+    trackSlug: "ujjayi",
+    levelIndex: 1,
+    pattern: { inhale: 4, exhale: 6 },
+  },
+  {
+    id: "breath-ujjayi-2",
+    type: "breathing",
+    slug: "ujjayi-nivel-2",
+    title: "Ujjayi · Nível 2",
+    description:
+      "Expiração mais longa que a inspiração — uma variação usada antes de dormir, inclusive deitada.",
+    durationSeconds: 300,
+    isFree: false,
+    trackSlug: "ujjayi",
+    levelIndex: 2,
+    pattern: { inhale: 4, exhale: 8 },
+  },
+  {
+    id: "breath-bhramari-1",
+    type: "breathing",
+    slug: "bhramari-nivel-1",
+    title: "Bhramari · Nível 1",
+    description:
+      "Inspire normalmente e solte o ar em um zumbido suave, como o de uma abelha, com a boca fechada.",
+    durationSeconds: 180,
+    isFree: true,
+    trackSlug: "bhramari",
+    levelIndex: 1,
+    pattern: { inhale: 4, exhale: 6 },
+  },
+  {
+    id: "breath-bhramari-2",
+    type: "breathing",
+    slug: "bhramari-nivel-2",
+    title: "Bhramari · Nível 2",
+    description: "Ciclos mais longos de zumbido, sustentando o som e a atenção na vibração.",
+    durationSeconds: 300,
+    isFree: false,
+    trackSlug: "bhramari",
+    levelIndex: 2,
+    pattern: { inhale: 4, exhale: 9 },
   },
   {
     id: "med-sintonizar-potencial",
