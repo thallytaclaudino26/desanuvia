@@ -168,7 +168,8 @@ export const contentItems: ContentItem[] = [
     type: "meditation",
     slug: "meditacao-sono",
     title: "Preparar para dormir",
-    description: "Relaxamento guiado para desligar o dia.",
+    description:
+      "Relaxamento guiado para desligar o dia. Praticar em ambiente com pouca luz ajuda o corpo a liberar melatonina, o hormônio que regula o sono.",
     durationSeconds: 600,
     isFree: false,
     goal: "sono",
