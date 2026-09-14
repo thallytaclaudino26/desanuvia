@@ -1,5 +1,11 @@
 export type ContentType = "breathing" | "meditation" | "sos";
-export type MeditationGoal = "ansiedade" | "sono" | "foco" | "autoestima";
+export type MeditationGoal =
+  | "ansiedade"
+  | "sono"
+  | "foco"
+  | "autoestima"
+  | "visualizacao"
+  | "disciplina";
 
 export interface BreathingPattern {
   inhale: number;
@@ -47,6 +53,12 @@ export const breathingTracks: BreathingTrack[] = [
     title: "Box Breathing",
     description:
       "Respiração em quadrado, usada por atletas e militares para foco sob pressão.",
+  },
+  {
+    slug: "coerencia-cardiaca",
+    title: "Coerência Cardíaca",
+    description:
+      "Respiração lenta e ritmada a partir do peito, para cultivar uma emoção elevada de forma sustentada.",
   },
 ];
 
@@ -164,6 +176,85 @@ export const contentItems: ContentItem[] = [
     goal: "autoestima",
   },
   {
+    id: "breath-coer-1",
+    type: "breathing",
+    slug: "coerencia-nivel-1",
+    title: "Coerência Cardíaca · Nível 1",
+    description: "Introdução ao ritmo de 5 segundos inspirando, 5 segundos expirando.",
+    durationSeconds: 180,
+    isFree: true,
+    trackSlug: "coerencia-cardiaca",
+    levelIndex: 1,
+    pattern: { inhale: 5, exhale: 5 },
+  },
+  {
+    id: "breath-coer-2",
+    type: "breathing",
+    slug: "coerencia-nivel-2",
+    title: "Coerência Cardíaca · Nível 2",
+    description: "Ciclos mais longos, sustentando a atenção no peito e a emoção cultivada.",
+    durationSeconds: 300,
+    isFree: false,
+    trackSlug: "coerencia-cardiaca",
+    levelIndex: 2,
+    pattern: { inhale: 5, exhale: 5 },
+  },
+  {
+    id: "med-sintonizar-potencial",
+    type: "meditation",
+    slug: "sintonizar-potencial",
+    title: "Sintonizar um novo potencial",
+    description:
+      "Visualize com antecedência a versão de você que já viveu essa mudança, sentindo agora a emoção de tê-la alcançado.",
+    durationSeconds: 900,
+    isFree: false,
+    goal: "visualizacao",
+  },
+  {
+    id: "med-filme-mental",
+    type: "meditation",
+    slug: "filme-mental-futuro",
+    title: "Filme mental do futuro",
+    description:
+      "Monte mentalmente cenas curtas do futuro que você quer viver, associando cada uma a uma emoção elevada.",
+    durationSeconds: 600,
+    isFree: false,
+    goal: "visualizacao",
+  },
+  {
+    id: "med-bencao-centros",
+    type: "meditation",
+    slug: "bencao-centros-energia",
+    title: "Bênção dos centros de energia",
+    description:
+      "Percorra a atenção por diferentes regiões do corpo, uma de cada vez, soltando a tensão acumulada em cada uma.",
+    durationSeconds: 1200,
+    isFree: false,
+    goal: "disciplina",
+  },
+  {
+    id: "med-caminhando",
+    type: "meditation",
+    slug: "meditacao-caminhando",
+    title: "Meditação caminhando",
+    description:
+      "Comece parada cultivando uma emoção elevada e uma intenção clara; depois caminhe devagar levando essa sensação para o corpo em movimento.",
+    durationSeconds: 600,
+    isFree: false,
+    goal: "disciplina",
+  },
+  {
+    id: "med-personificacao",
+    type: "meditation",
+    slug: "ser-quem-voce-quer-ser",
+    title: "Ser quem você quer ser, agora",
+    description:
+      "Escolha um momento comum do seu dia — uma fila, o trânsito, um trajeto a pé — para conscientemente agir e sentir como a pessoa que você está se tornando.",
+    durationSeconds: 90,
+    isFree: true,
+    goal: "disciplina",
+  },
+  {
     id: "sos-emergencia",
     type: "sos",
     slug: "sos-emergencia",
@@ -194,4 +285,6 @@ export const meditationGoals: { slug: MeditationGoal; label: string }[] = [
   { slug: "sono", label: "Sono" },
   { slug: "foco", label: "Foco" },
   { slug: "autoestima", label: "Autoestima" },
+  { slug: "visualizacao", label: "Visualização" },
+  { slug: "disciplina", label: "Disciplina" },
 ];

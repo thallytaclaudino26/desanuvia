@@ -3,13 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getDailyRecommendation } from "@/lib/recommendation";
+import { getDailyTip } from "@/lib/motivation";
 import type { ContentItem } from "@/lib/content";
 
 export default function HomePage() {
   const [recommendation, setRecommendation] = useState<ContentItem | null>(null);
+  const [tip, setTip] = useState<string | null>(null);
 
   useEffect(() => {
     getDailyRecommendation().then(setRecommendation);
+    // Calculado no cliente (depende da data local) para não descasar do
+    // HTML gerado no servidor em builds estáticos.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTip(getDailyTip());
   }, []);
 
   return (
@@ -39,6 +45,15 @@ export default function HomePage() {
         <QuickLink href="/library/meditacoes" emoji="🧘" label="Meditar" />
         <QuickLink href="/session/med-sono" emoji="🌙" label="Dormir" />
       </div>
+
+      {tip && (
+        <div className="rounded-2xl border border-teal-900/10 bg-white px-5 py-4 dark:border-teal-100/10 dark:bg-neutral-900">
+          <span className="text-xs uppercase tracking-wide text-teal-700/60 dark:text-teal-300/60">
+            Pensamento do dia
+          </span>
+          <p className="mt-1 text-sm text-teal-900 dark:text-teal-100">{tip}</p>
+        </div>
+      )}
     </main>
   );
 }
